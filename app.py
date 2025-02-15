@@ -1,31 +1,27 @@
 from flask import Flask
-from flask_restful import Api
 from helpers.database import db
 from helpers.cors import cors
+from helpers.api import api  
 from resources.documentos import Documento
 
-# Inicializando a aplicação Flask
 app = Flask(__name__)
 
-# Configurando a API
-api = Api(app)
-
-# Configurando o banco de dados PostgreSQL
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/database'
+# Configurando o banco de dados
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/solr'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializando o SQLAlchemy com o app
+# Inicializando extensões
 db.init_app(app)
-
-# Inicializando o CORS com o app
 cors.init_app(app)
+api.init_app(app)
 
-# Criando as tabelas 
+# Criando as tabelas
 with app.app_context():
-    db.create_all()  # Criar as tabelas
+    db.create_all()
 
-# Definindo as rotas da API
-api.add_resource(Documento, '/documentos', '/documentos/<int:documento_id>')
+with app.app_context():
+    csv_path = './ocupacao.csv'
+    Documento.importar_csv(csv_path) 
 
 if __name__ == '__main__':
     app.run(debug=True)
