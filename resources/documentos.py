@@ -10,16 +10,29 @@ class Documento(Resource):
     Métodos GET, POST.
     """
     
-    @marshal_with(documento_fields)
-    def get(self, documento_id=None):
-        if documento_id:
-            documento = DocumentoModel.query.filter_by(id=documento_id).first()
-            if documento:
-                return documento, 200
-            return {'message': 'Documento não encontrado'}, 404
-        else:
-            documentos = DocumentoModel.query.all()
-            return documentos, 200
+    def get(self):
+        query = request.args.get('q', '')  # pega o parâmetro "q" da URL
+        if not query:
+            return {'message': 'Consulta não pode estar vazia'}, 400
+
+        url_solr = "http://localhost:8983/solr/cbo/select"
+        params = {
+            "q": f"titulo:{query}~",
+            "rows": 10,
+            "defType": "edismax", # parser edismax para melhorar a relevância
+            "qf": "titulo codigo",
+            "wt" : "json"
+        }
+
+        try:
+            # faz a consulta no Solr
+            response = requests.get(url_solr, params=params)
+            if response.status_code == 200:
+                return response.json()['response']['docs'], 200 # se deu certo, retorna os documentos
+            else:
+                return {'message': 'Erro ao buscar dados no Solr', 'details': response.text}, response.status_code
+        except requests.exceptions.RequestException as e:
+            return {'message': f'Erro de conexão com o Solr: {str(e)}'}, 500
 
     @marshal_with(documento_fields)
     def post(self):
@@ -35,6 +48,7 @@ class Documento(Resource):
         db.session.commit()
         return novo_documento, 201
 
+    @staticmethod
     def importar_csv(path):
         """Função para importar dados do CSV para o banco de dados."""
         try:
@@ -53,16 +67,16 @@ class Documento(Resource):
                 print(f"Importação concluída com sucesso. {count} documentos processados.")
         except Exception as e:
             print(f"Erro ao processar o arquivo CSV: {str(e)}")
-
+    
     def enviar_solr(self):
         """Consulta os documentos no banco e envia para o Solr via POST."""
         
-        url_solr = "http://localhost:8983/solr/cbo/update?commit=true"  
+        url_solr = "http://localhost:8983/solr/cbo/update?commitWithin=5000"  
         documentos = DocumentoModel.query.all()
         if not documentos:
             return {'message': 'Nenhum documento encontrado para enviar ao Solr'}, 400
 
-        # Converter pra JSON 
+        # converte pra json
         dados_para_solr = [
             {"id": str(doc.id), "codigo": doc.codigo, "titulo": doc.titulo} 
             for doc in documentos
