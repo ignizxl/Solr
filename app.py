@@ -21,7 +21,8 @@ with app.app_context():
 
 with app.app_context():
     csv_path = './ocupacao.csv'
-    Documento.importar_csv(csv_path) 
+    Documento.importar_csv(csv_path)
+    Documento().enviar_solr()
 
 if __name__ == '__main__':
     app.run(debug=True)
