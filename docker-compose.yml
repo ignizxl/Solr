@@ -1,0 +1,58 @@
+networks:
+  my_solr_network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: solr_cbo
+    ports:
+      - "5432:5432"
+    networks:
+      - my_solr_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - my_solr_network
+
+  solr:
+    build:
+      context: .
+      dockerfile: Dockerfile-solr # Use o seu Dockerfile
+    container_name: solr_container
+    restart: always
+    environment:
+      - SOLR_URL=http://localhost:8983/solr
+      - CORE_NAME=cbo
+    ports:
+      - "8983:8983"
+    networks:
+      - my_solr_network
+  # flask:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-flask
+  #   container_name: flask_container
+  #   restart: always
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - FLASK_APP=app.py
+  #     - FLASK_ENV=development
+  #   networks:
+  #     - my_solr_network
+  #   depends_on:
+  #     - postgres
