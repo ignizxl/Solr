@@ -1,32 +1,34 @@
 # Configuração do Solr com Docker e API Flask
 
-Este projeto configura o Solr com Docker para indexação de dados, além de implementar uma API Flask para mapear dados de um CSV para um banco de dados PostgreSQL e interagir com o Solr para indexação e consultas.
+Este projeto usa Docker Compose para configurar os serviços necessários para a aplicação: PostgreSQL, pgAdmin e Solr. Além de implementar uma API Flask para mapear dados de um CSV para um banco de dados PostgreSQL e interagir com o Solr para indexação e consultas.
 
-## 1. **Configuração do Solr com Dockerfile**
+Os serviços são definidos em um arquivo `docker-compose.yml` com a configuração de redes, containers e variáveis de ambiente. O Solr é configurado para ser iniciado com um script de inicialização, e o PostgreSQL é utilizado como banco de dados para armazenar os dados.
 
-### 1.1 **Script `scripts/init-solr.sh`**
+### **Comandos Docker Compose**
 
-Este script é responsável por configurar o Solr no Docker. Ele cria o core desejado e adiciona campos ao schema automaticamente.
+- **Executar Docker Compose em Background:**
+  
+  Para rodar os serviços definidos no `docker-compose.yml` em segundo plano (modo detached), use o seguinte comando:
+  
+  ```bash
+  docker-compose up -d
+  ```
 
-#### Descrição do Script
+- **Parar os serviços com Docker Compose:**
 
-- Inicia o Solr e cria um core se ele não existir.
-- Adiciona dois campos ao schema do core: `codigo` e `titulo`.
-- Exibe os logs do Solr para monitoramento contínuo.
+  Para parar os serviços em execução, execute:
+  
+  ```bash
+  docker-compose down
+  ```
 
-### 1.2 **Dockerfile**
+- **Excluir volumes ao parar os serviços:**
 
-O Dockerfile configura o Solr utilizando a imagem oficial do Bitnami e executa o script de inicialização (`init-solr.sh`).
-
-#### Comandos para Construir e Executar o Container
-
-```bash
-docker build -t solr_cbo .
-```
-
-```bash
-docker run -d -p 8983:8983 --name solr_cbo solr_cbo
-```
+  Para remover os volumes, utilize o comando abaixo:
+  
+  ```bash
+  docker-compose down -v
+  ```
 
 ---
 
