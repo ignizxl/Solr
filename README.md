@@ -34,6 +34,64 @@ docker run -d -p 8983:8983 --name solr_cbo solr_cbo
 
 ---
 
+Esta é uma API desenvolvida em Flask para gerenciar documentos, com integração ao banco de dados PostgreSQL e ao mecanismo de busca Apache Solr. A API permite realizar apenas duas operações CRUD (criar e buscar) nos documentos, além de importar dados de um arquivo CSV para o banco e enviar esses dados para o Solr para indexação e busca.
+
+### **2.1 Funcionalidades**
+
+- **CRUD de Documentos:** Criar e buscar documentos armazenados no banco de dados PostgreSQL.
+
+- **Importação de CSV:** Importar documentos de um arquivo CSV para o banco de dados.
+
+- **Envio para Solr:** Enviar documentos armazenados no banco de dados para o Solr para indexação e buscas rápidas.
+
+- **Busca Elástica:**  Realizar consultas flexíveis no Solr usando parâmetros específicos para otimizar os resultados.
+
+A seguir, são apresentados exemplos de como utilizar o endpoint de busca para realizar consultas com a funcionalidade de busca elástica via cURL e diretamente no navegador (Via HTTP).
+
+## Endpoint de Busca
+
+### **GET /api/documentos**
+Este endpoint realiza buscas no Solr com base em uma consulta fornecida via parâmetro `q`. A busca utiliza o Solr para realizar uma pesquisa aproximada no título e código dos documentos armazenados no banco de dados.
+
+**Parâmetros**:
+- `q` (obrigatório): O termo de busca para consulta no Solr. Este parâmetro é usado para buscar no campo `titulo` do documento.
+
+
+## Exemplos de busca elástica
+
+### 1. **Busca usando cURL**
+
+Você pode usar o cURL para realizar a consulta diretamente para o endpoint da API.
+
+#### Exemplo 1: Consultar documentos com o termo "General"
+```bash
+curl -X GET "http://localhost:5000/api/documentos?q=General"
+```
+
+#### Exemplo 2: Consultar documentos com múltiplos termos de busca "engenheiro mecatrônico"
+```bash
+curl -X GET "http://localhost:5000/api/documentos?q=engenheiro%20mecatrônico"
+```
+
+Esses comandos irão realizar uma busca no campo titulo do Solr, retornando os documentos correspondentes. O parâmetro q é usado para especificar o termo de busca e, no exemplo acima, o termo de busca é "general" ou múltiplos termos.
+
+##### **Você também pode realizar buscas diretamente no navegador (via HTTP).**
+
+Seguindo os exemplos acima mas, desta vez no seu navegador
+
+> Abra o seu navegador e cole as URLs dos exemplos abaixo 
+
+#### Exemplo 1: Consultar documentos com o termo "General"
+```bash
+  http://localhost:5000/api/documentos?q=General
+```
+
+#### Exemplo 2: Consultar documentos com múltiplos termos de busca "engenheiro mecatrônico" 
+```bash
+  http://localhost:5000/api/documentos?q=engenheiro mecatrônico
+```
+> Essas URLs irão fazer uma consulta no Solr e retornar os documentos que correspondem ao termo especificado no parâmetro q.
+
 ### **3. Consultas ao Solr (via HTTP)**
 
 **3.1. Consultar por `codigo`**
@@ -79,7 +137,6 @@ docker run -d -p 8983:8983 --name solr_cbo solr_cbo
   - **Exemplo de consulta**:
 
     ```bash
-
     http://localhost:8983/solr/cbo/select?q=*:*&wt=json
     ```
 
