@@ -2,12 +2,12 @@ import csv
 import json
 import requests
 from flask import request
-from flask_restful import Resource, marshal_with
-from models.documentos import DocumentoModel, db, documento_fields
+from flask_restful import Resource
+from models.documentos import DocumentoModel, db
 
 class Documento(Resource):
     """
-    Métodos GET, POST.
+    Métodos GET.
     """
     
     def get(self):
@@ -18,7 +18,7 @@ class Documento(Resource):
         url_solr = "http://localhost:8983/solr/cbo/select"
         params = {
             "q": f"titulo:{query}~",
-            "rows": 10,
+            "rows": 50,
             "defType": "edismax", # parser edismax para melhorar a relevância
             "qf": "titulo codigo",
             "wt" : "json"
@@ -33,20 +33,6 @@ class Documento(Resource):
                 return {'message': 'Erro ao buscar dados no Solr', 'details': response.text}, response.status_code
         except requests.exceptions.RequestException as e:
             return {'message': f'Erro de conexão com o Solr: {str(e)}'}, 500
-
-    @marshal_with(documento_fields)
-    def post(self):
-        dados = request.get_json()
-        if not (dados.get('codigo') and dados.get('titulo')):
-            return {'message': 'Código e título são obrigatórios'}, 400
-
-        novo_documento = DocumentoModel(
-            codigo=dados['codigo'],
-            titulo=dados['titulo']
-        )
-        db.session.add(novo_documento)
-        db.session.commit()
-        return novo_documento, 201
 
     @staticmethod
     def importar_csv(path):
