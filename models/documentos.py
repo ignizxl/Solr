@@ -1,12 +1,4 @@
-from flask_restful import fields
 from helpers.database import db  # Importa a instância db
-
-# Definindo o esquema de saída para Documento
-documento_fields = {
-  'id': fields.Integer,
-  'codigo': fields.String,
-  'titulo': fields.String
-}
 
 # Modelo do Documento
 class DocumentoModel(db.Model):
