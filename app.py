@@ -6,9 +6,8 @@ from resources.documentos import Documento
 
 app = Flask(__name__)
 
-# Configurando o banco de dados
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "postgresql://admin:admin@localhost:5432/solr_cbo"
+    "postgresql://admin:admin@postgres:5432/solr_cbo"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
