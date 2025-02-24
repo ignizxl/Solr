@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-core_name="${CORE_NAME}"
-solr_url="${SOLR_URL}"
+core_name="cbo"
+solr_url="http://localhost:8983/solr"
 
 echo "🕒 Aguardando o Solr iniciar..."
 solr start
