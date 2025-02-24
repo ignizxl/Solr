@@ -1,8 +1,5 @@
 FROM bitnami/solr:latest
 
-ENV CORE_NAME=cbo
-ENV SOLR_URL=http://localhost:8983/solr
-
 USER root
 
 COPY scripts/init-solr.sh /init.sh

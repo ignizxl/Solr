@@ -11,6 +11,11 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: solr_cbo
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U solr_cbo" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     networks:
@@ -31,28 +36,33 @@ services:
   solr:
     build:
       context: .
-      dockerfile: Dockerfile-solr # Use o seu Dockerfile
+      dockerfile: Dockerfile-solr
     container_name: solr_container
     restart: always
-    environment:
-      - SOLR_URL=http://localhost:8983/solr
-      - CORE_NAME=cbo
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8983/solr/cbo/admin/ping?wt=json | grep -iq 'status.*OK' || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "8983:8983"
     networks:
       - my_solr_network
-  # flask:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-flask
-  #   container_name: flask_container
-  #   restart: always
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - FLASK_APP=app.py
-  #     - FLASK_ENV=development
-  #   networks:
-  #     - my_solr_network
-  #   depends_on:
-  #     - postgres
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile-flask
+    container_name: flask_container
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    networks:
+      - my_solr_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
