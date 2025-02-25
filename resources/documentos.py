@@ -8,7 +8,7 @@ from models.documentos import DocumentoModel, db, documento_fields
 
 class Documento(Resource):
     """
-    Métodos GET, POST.
+    Métodos GET.
     """
 
     def get(self):
@@ -51,7 +51,7 @@ class Documento(Resource):
         db.session.add(novo_documento)
         db.session.commit()
         return novo_documento, 201
-
+    
     @staticmethod
     def importar_csv(path):
         """Função para importar dados do CSV para o banco de dados."""
