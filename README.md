@@ -42,8 +42,6 @@ Os serviços são definidos em um arquivo `docker-compose.yml`, com a configura�
 
 ---
 
-Aqui está a versão reescrita de forma mais coesa e coerente:
-
 ### 2. **API Flask**
 
 Esta API foi desenvolvida em Flask para gerenciar documentos, com integração ao banco de dados PostgreSQL e ao mecanismo de busca Apache Solr. Ela oferece operações básicas de CRUD (criar e buscar) para os documentos, além de permitir a importação de dados de um arquivo CSV para o banco de dados e o envio desses dados ao Solr para indexação e busca eficiente.
