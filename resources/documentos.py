@@ -2,8 +2,8 @@ import csv
 import json
 import requests
 from flask import request
-from flask_restful import Resource
-from models.documentos import DocumentoModel, db
+from flask_restful import Resource, marshal_with
+from models.documentos import DocumentoModel, db, documento_fields
 
 class Documento(Resource):
     """
@@ -34,6 +34,20 @@ class Documento(Resource):
         except requests.exceptions.RequestException as e:
             return {'message': f'Erro de conexão com o Solr: {str(e)}'}, 500
 
+    @marshal_with(documento_fields)
+    def post(self):
+        dados = request.get_json()
+        if not (dados.get('codigo') and dados.get('titulo')):
+            return {'message': 'Código e título são obrigatórios'}, 400
+
+        novo_documento = DocumentoModel(
+            codigo=dados['codigo'],
+            titulo=dados['titulo']
+        )
+        db.session.add(novo_documento)
+        db.session.commit()
+        return novo_documento, 201
+    
     @staticmethod
     def importar_csv(path):
         """Função para importar dados do CSV para o banco de dados."""
