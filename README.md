@@ -1,17 +1,27 @@
 # Configuração do Solr com Docker e API Flask
 
-Este projeto usa Docker Compose para configurar os serviços necessários para a aplicação: PostgreSQL, pgAdmin e Solr. Além de implementar uma API Flask para mapear dados de um CSV para um banco de dados PostgreSQL e interagir com o Solr para indexação e consultas.
+Este projeto usa Docker Compose para configurar os serviços necessários para a aplicação: API Flask, PostgreSQL e Solr. A API Flask mapeia os dados de um CSV para o banco de dados PostgreSQL e, em seguida, coleta todos os dados, os organiza em um JSON e os envia para o Solr para indexação e consultas.
 
-Os serviços são definidos em um arquivo `docker-compose.yml` com a configuração de redes, containers e variáveis de ambiente. O Solr é configurado para ser iniciado com um script de inicialização, e o PostgreSQL é utilizado como banco de dados para armazenar os dados.
+Os serviços são definidos em um arquivo `docker-compose.yml`, com a configuração de redes, containers e variáveis de ambiente. O Solr é iniciado com um script de inicialização, enquanto o PostgreSQL armazena os dados.
+
+---
 
 ### **Comandos Docker Compose**
 
 - **Executar Docker Compose em Background:**
-  
+
   Para rodar os serviços definidos no `docker-compose.yml` em segundo plano (modo detached), use o seguinte comando:
   
   ```bash
   docker-compose up -d
+  ```
+
+- **Rebuild dos Containers (se o Compose não funcionar corretamente):**
+
+  Caso o Docker Compose não esteja funcionando como esperado, execute o comando abaixo para reconstruir os containers e garantir que tudo esteja configurado corretamente:
+  
+  ```bash
+  docker-compose up --build -d
   ```
 
 - **Parar os serviços com Docker Compose:**
@@ -32,167 +42,67 @@ Os serviços são definidos em um arquivo `docker-compose.yml` com a configuraç
 
 ---
 
-### 2. **API Flask para Integração com PostgreSQL e Solr**
+Aqui está a versão reescrita de forma mais coesa e coerente:
 
----
+### 2. **API Flask**
 
-Esta é uma API desenvolvida em Flask para gerenciar documentos, com integração ao banco de dados PostgreSQL e ao mecanismo de busca Apache Solr. A API permite realizar apenas duas operações CRUD (criar e buscar) nos documentos, além de importar dados de um arquivo CSV para o banco e enviar esses dados para o Solr para indexação e busca.
+Esta API foi desenvolvida em Flask para gerenciar documentos, com integração ao banco de dados PostgreSQL e ao mecanismo de busca Apache Solr. Ela oferece operações básicas de CRUD (criar e buscar) para os documentos, além de permitir a importação de dados de um arquivo CSV para o banco de dados e o envio desses dados ao Solr para indexação e busca eficiente.
 
-### **2.1 Funcionalidades**
+#### **2.1 Funcionalidades**
 
-- **CRUD de Documentos:** Criar e buscar documentos armazenados no banco de dados PostgreSQL.
+- **CRUD de Documentos:** Permite a criação e a busca de documentos armazenados no banco de dados PostgreSQL.
 
-- **Importação de CSV:** Importar documentos de um arquivo CSV para o banco de dados.
+- **Importação de CSV:** Facilita a importação de documentos de um arquivo CSV para o banco de dados PostgreSQL.
 
-- **Envio para Solr:** Enviar documentos armazenados no banco de dados para o Solr para indexação e buscas rápidas.
+- **Envio para Solr:** Envia os documentos armazenados no banco de dados para o Solr, realizando a indexação para buscas rápidas.
 
-- **Busca Elástica:**  Realizar consultas flexíveis no Solr usando parâmetros específicos para otimizar os resultados.
+- **Busca Elástica:** Permite realizar consultas flexíveis no Solr, utilizando parâmetros específicos para otimizar os resultados.
 
-A seguir, são apresentados exemplos de como utilizar o endpoint de busca para realizar consultas com a funcionalidade de busca elástica via cURL e diretamente no navegador (Via HTTP).
+A seguir, são apresentados exemplos de como utilizar o endpoint de busca para consultas, tanto via cURL quanto diretamente no navegador (via HTTP).
 
-## Endpoint de Busca
+#### **2.2 Endpoint de Busca**
 
-### **GET /api/documentos**
-Este endpoint realiza buscas no Solr com base em uma consulta fornecida via parâmetro `q`. A busca utiliza o Solr para realizar uma pesquisa aproximada no título e código dos documentos armazenados no banco de dados.
+O endpoint de busca permite realizar buscas nos documentos armazenados no banco de dados PostgreSQL e indexados no Solr. A pesquisa é realizada com base em uma consulta fornecida via parâmetro `q`, que é usado para buscar no campo `titulo` e `codigo` dos documentos.
 
 **Parâmetros**:
-- `q` (obrigatório): O termo de busca para consulta no Solr. Este parâmetro é usado para buscar no campo `titulo` do documento.
 
+- `q` (obrigatório): O termo de busca que será utilizado para procurar nos campos `titulo` e `codigo` dos documentos.
 
-## Exemplos de busca elástica
+#### **2.3 Exemplos de Consultas HTTP**
 
-### 1. **Busca usando cURL**
+##### 1. **Consulta utilizando cURL**
 
-Você pode usar o cURL para realizar a consulta diretamente para o endpoint da API.
+Você pode utilizar o cURL para fazer uma requisição GET diretamente ao endpoint da API.
 
-#### Exemplo 1: Consultar documentos com o termo "General"
-```bash
-curl -X GET "http://localhost:5000/api/documentos?q=General"
-```
+- **Exemplo 1:** Buscar documentos com o termo "General"
+  
+  ```bash
+  curl -X GET "http://localhost:5000/api/documentos?q=General"
+  ```
 
-#### Exemplo 2: Consultar documentos com múltiplos termos de busca "engenheiro mecatrônico"
-```bash
-curl -X GET "http://localhost:5000/api/documentos?q=engenheiro%20mecatrônico"
-```
+- **Exemplo 2:** Buscar documentos com múltiplos termos, como "engenheiro mecatrônico"
+  
+  ```bash
+  curl -X GET "http://localhost:5000/api/documentos?q=engenheiro%20mecatrônico"
+  ```
+
+##### 2. **Consulta via Navegador (HTTP)**
+
+Você também pode fazer a busca diretamente no navegador acessando a URL correspondente, por exemplo:
+
+- **Exemplo 1:** Buscar documentos com o termo "General"
+  
+  ```bash
+  http://localhost:5000/api/documentos?q=General
+  ```
+
+- **Exemplo 2:** Buscar documentos com o termo "engenheiro mecatrônico"
+  
+  ```bash
+  http://localhost:5000/api/documentos?q=engenheiro%20mecatrônico
+  ```
 
 Esses comandos irão realizar uma busca no campo titulo do Solr, retornando os documentos correspondentes. O parâmetro q é usado para especificar o termo de busca e, no exemplo acima, o termo de busca é "general" ou múltiplos termos.
-
-##### **Você também pode realizar buscas diretamente no navegador (via HTTP).**
-
-Seguindo os exemplos acima mas, desta vez no seu navegador
-
-> Abra o seu navegador e cole as URLs dos exemplos abaixo 
-
-#### Exemplo 1: Consultar documentos com o termo "General"
-```bash
-  http://localhost:5000/api/documentos?q=General
-```
-
-#### Exemplo 2: Consultar documentos com múltiplos termos de busca "engenheiro mecatrônico" 
-```bash
-  http://localhost:5000/api/documentos?q=engenheiro mecatrônico
-```
-> Essas URLs irão fazer uma consulta no Solr e retornar os documentos que correspondem ao termo especificado no parâmetro q.
-
-### **3. Consultas ao Solr (via HTTP)**
-
-**3.1. Consultar por `codigo`**
-
-- **Descrição**: Pesquisa pelo código exato em `codigo`.
-
-  - **Exemplo de consulta**:
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=codigo:12345&wt=json
-    ```
-
-**3.2. Consultar por `titulo`**
-
-- **Descrição**: Pesquisa pelo título exato em `titulo`.
-
-  - **Exemplo de consulta**:
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=titulo:software&wt=json
-    ```
-
-- **Consulta com Wildcard (parcial do título)**
-
-  - **Exemplo**: Busca por títulos que contêm "Eng".
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=titulo:*Eng*&wt=json
-    ```
-
-**3.3. Consultar com múltiplos critérios (`codigo` e `titulo`)**
-
-- **Descrição**: Pesquisa combinada entre `codigo` e `titulo`.
-  - **Exemplo de consulta**:
-  
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=codigo:1234 AND titulo:engenheiro&wt=json
-    ```
-
-**3.4. Consultar todos os documentos**
-
-- **Descrição**: Retorna todos os documentos no core.
-  - **Exemplo de consulta**:
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=*:*&wt=json
-    ```
-
-**3.5. Consultar com filtros**
-
-- **Filtro por `codigo`** (exemplo: `codigo` maior ou igual a 1000):
-  
-  - **Exemplo de consulta**:
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=codigo:[1000 TO *]&wt=json
-    ```
-
-- **Filtro por `titulo`** (exemplo: títulos que começam com "ana"):
-  
-  - **Exemplo de consulta**:
-
-    ```bash
-    http://localhost:8983/solr/cbo/select?q=titulo:ana*&wt=json
-    ```
-
----
-
-### **4. Enviar dados para o servidor Solr**
-
-Para enviar dados para o Solr, você deve utilizar a URL do core configurado e o endpoint de **update** do Solr. O Solr suporta inserção de dados em formato **JSON** ou **XML** via HTTP POST.
-
-### **Exemplo de URL para Enviar Dados para o Solr**
-
-Se o core estiver configurado com o nome `cbo`, a URL para enviar os dados seria:
-
-```bash
-http://localhost:8983/solr/cbo/update?commit=true
-```
-
-- **`/update`**: Endpoint que permite a inserção de dados no Solr.
-- **`?commit=true`**: Parâmetro que faz o commit (salvamento) dos dados imediatamente após a inserção.
-
-#### **Exemplo de Dados JSON para Inserção**
-
-```json
-[
-  {
-    "id": 1,
-    "codigo": "12345",
-    "titulo": "Engenheiro de Software"
-  },
-  {
-    "id": 2,
-    "codigo": "67890",
-    "titulo": "Analista de Sistemas"
-  }
-]
-```
 
 ---
 
@@ -200,10 +110,10 @@ http://localhost:8983/solr/cbo/update?commit=true
 
 Este projeto depende das seguintes tecnologias e bibliotecas:
 
-- **Solr**: Para indexação e pesquisa de dados.
-- **Docker**: Para criar o container do Solr.
-- **Flask**: Para a API que interage com o banco de dados e o Solr.
-- **PostgreSQL**: Para o banco de dados onde os dados são armazenados.
+- **[Solr](https://hub.docker.com/r/bitnami/solr)**: Para indexação e pesquisa de dados.
+- **[Docker](https://www.docker.com/)**: Para criar o container do Solr.
+- **[Flask](https://flask-restful.readthedocs.io/en/latest/)**: Para a API que interage com o banco de dados e o Solr.
+- **[PostgreSQL](https://www.postgresql.org/)**: Para o banco de dados onde os dados são armazenados.
 
 ---
 
