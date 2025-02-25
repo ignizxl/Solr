@@ -46,6 +46,8 @@ Os serviços são definidos em um arquivo `docker-compose.yml`, com a configura�
 
 Esta API foi desenvolvida em Flask para gerenciar documentos, com integração ao banco de dados PostgreSQL e ao mecanismo de busca Apache Solr. Ela oferece operações básicas de CRUD (criar e buscar) para os documentos, além de permitir a importação de dados de um arquivo CSV para o banco de dados e o envio desses dados ao Solr para indexação e busca eficiente.
 
+---
+
 #### **2.1 Funcionalidades**
 
 - **CRUD de Documentos:** Permite a criação e a busca de documentos armazenados no banco de dados PostgreSQL.
@@ -57,6 +59,8 @@ Esta API foi desenvolvida em Flask para gerenciar documentos, com integração a
 - **Busca Elástica:** Permite realizar consultas flexíveis no Solr, utilizando parâmetros específicos para otimizar os resultados.
 
 A seguir, são apresentados exemplos de como utilizar o endpoint de busca para consultas, tanto via cURL quanto diretamente no navegador (via HTTP).
+
+---
 
 #### **2.2 Endpoint de Busca**
 
