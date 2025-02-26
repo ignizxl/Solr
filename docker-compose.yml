@@ -21,22 +21,10 @@ services:
     networks:
       - my_solr_network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_container
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    networks:
-      - my_solr_network
-
   solr:
     build:
       context: .
-      dockerfile: Dockerfile-solr
+      dockerfile: solr.Dockerfile
     container_name: solr_container
     restart: always
     healthcheck:
@@ -51,7 +39,7 @@ services:
   flask:
     build:
       context: .
-      dockerfile: Dockerfile-flask
+      dockerfile: flask.Dockerfile
     container_name: flask_container
     restart: always
     ports:
